@@ -1,5 +1,6 @@
 import hashlib
 import tkinter as tk
+from datetime import datetime
 
 def hash_password(password):
     """Hache un mot de passe en SHA-256."""
@@ -9,6 +10,10 @@ def log_message(text_widget, message):
     """Ajoute un message à un widget Text (logs)."""
     text_widget.insert(tk.END, message + "\n")
     text_widget.see(tk.END)
+
+def get_timestamp():
+    """Retourne un timestamp au format : [YYYY-MM-DD HH:MM:SS.mmm]"""
+    return datetime.now().strftime("[%Y-%m-%d %H:%M:%S]")  # Supprime les 3 derniers chiffres des microsecondes
 
 def extract_hl7_id(file_path):
     """Extrait l'identifiant depuis une ligne PID dans un fichier HL7."""
