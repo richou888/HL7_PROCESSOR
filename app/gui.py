@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter import ttk, filedialog, messagebox
 from app.processor import HL7Processor
 from app.helpers import log_message
+from app.helpers import get_timestamp
 import threading
 
 class HL7ProcessorApp:
@@ -73,18 +74,19 @@ class HL7ProcessorApp:
         directory = filedialog.askdirectory(title="Sélectionner le dossier HL7")
         if directory:
             self.hl7_directory.set(directory)
-            self.root.after(0, lambda: log_message(self.log_text, f"Dossier HL7 sélectionné : {directory}"))
+            self.root.after(0, lambda: log_message(self.log_text, f"{get_timestamp()} Dossier HL7 sélectionné : {directory}"))
 
     def choose_identifiers_file(self):
         file_path = filedialog.askopenfilename(title="Sélectionner le fichier d'identifiants (CSV)")
         if file_path:
             self.identifiers_file.set(file_path)
-            self.root.after(0, lambda: log_message(self.log_text, f"Fichier d'identifiants sélectionné : {file_path}"))
+            self.root.after(0, lambda: log_message(self.log_text, f"{get_timestamp()} Fichier d'identifiants sélectionné : {file_path}"))
 
     def start_processing(self):
         if not self.hl7_directory.get() or not self.identifiers_file.get():
             messagebox.showwarning("Attention", "Veuillez sélectionner un dossier HL7 et un fichier d'identifiants.")
             return
+        self.root.after(0, lambda: log_message(self.log_text, f"{get_timestamp()} Traitement démarré par l'utilisateur"))
 
         # Désactive les boutons pendant le traitement
         self.start_button.config(state=tk.DISABLED)
@@ -123,9 +125,11 @@ class HL7ProcessorApp:
                 # Mise à jour des résultats et des logs dans le thread principal
                 for path in self.processor.results:
                     self.root.after(0, lambda p=path: self.tree.insert("", tk.END, values=(p,)))
-                self.root.after(0, lambda: log_message(self.log_text, f"Traitement terminé. {len(self.processor.results)} fichiers à supprimer."))
+                
+                timestamp = get_timestamp()
+                self.root.after(0, lambda: log_message(self.log_text, f"{get_timestamp()} Traitement terminé. {len(self.processor.results)} fichiers à supprimer."))
             except Exception as e:
-                self.root.after(0, lambda: log_message(self.log_text, f"Erreur pendant le traitement : {e}"))
+                self.root.after(0, lambda: log_message(self.log_text, f"{get_timestamp()} Erreur pendant le traitement : {e}"))
             finally:
                 # Réactive les boutons dans le thread principal
                 self.root.after(0, lambda: self.start_button.config(state=tk.NORMAL))
@@ -138,7 +142,7 @@ class HL7ProcessorApp:
     def _update_progress_safely(self, current, total):
         """Met à jour la barre de progression et les logs de manière thread-safe."""
         self.progress["value"] = (current / total) * 100 if total > 0 else 0
-        self.log_text.insert(tk.END, f"Progression : {current}/{total} fichiers traités\n")
+        self.log_text.insert(tk.END, f"{get_timestamp()} Progression : {current}/{total} fichiers traités\n")
         self.log_text.see(tk.END)
         self.root.update_idletasks()
 
@@ -146,7 +150,7 @@ class HL7ProcessorApp:
         """Annule le traitement en cours."""
         self.processor.stop_requested = True
         self.root.after(0, lambda: self.cancel_button.config(state=tk.DISABLED))
-        self.root.after(0, lambda: log_message(self.log_text, "Traitement annulé par l'utilisateur."))
+        self.root.after(0, lambda: log_message(self.log_text, f"{get_timestamp()} Traitement annulé par l'utilisateur."))
 
     def export_report(self):
         """Exporte le rapport des fichiers à supprimer."""
@@ -162,7 +166,7 @@ class HL7ProcessorApp:
         if file_path:
             try:
                 self.processor.save_report(file_path)
-                self.root.after(0, lambda: log_message(self.log_text, f"Rapport exporté vers {file_path}"))
+                self.root.after(0, lambda: log_message(self.log_text, f"{get_timestamp()} Rapport exporté vers {file_path}"))
             except Exception as e:
                 messagebox.showerror("Erreur", f"Impossible d'exporter le rapport : {e}")
 
