@@ -50,9 +50,9 @@ def extract_hl7_date(file_path):
             for line in f:
                 if line.startswith("SPM"):
                     parts = line.split('|')
-                    # Index 18 = 19ème champ (0-based)
-                    if len(parts) > 18:
-                        date_str = parts[18].strip()
+                    # Index 17 = 18ème champ (0-based) Date de prélèvement
+                    if len(parts) > 17:
+                        date_str = parts[17].strip()
                         if len(date_str) >= 14:
                             try:
                                 last_spm_date = datetime.strptime(date_str[:14], "%Y%m%d%H%M%S")
