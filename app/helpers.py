@@ -12,8 +12,8 @@ def log_message(text_widget, message):
     text_widget.see(tk.END)
 
 def get_timestamp():
-    """Retourne un timestamp au format : [YYYY-MM-DD HH:MM:SS.mmm]"""
-    return datetime.now().strftime("[%Y-%m-%d %H:%M:%S]")  # Supprime les 3 derniers chiffres des microsecondes
+    """Retourne un timestamp au format : [YYYY-MM-DD HH:MM:SS]"""
+    return datetime.now().strftime("[%Y-%m-%d %H:%M:%S]")
 
 def extract_hl7_id(file_path):
     """Extrait l'identifiant depuis une ligne PID dans un fichier HL7."""
@@ -33,4 +33,32 @@ def extract_hl7_id(file_path):
         return None
     except Exception as e:
         print(f"Erreur lors de la lecture de {file_path}: {e}")
+        return None
+
+def extract_hl7_date(file_path):
+    """
+    Extrait la date depuis le DERNIER segment SPM d'un fichier HL7.
+    Le champ ciblé est le 17ème champ (index 17 après split '|').
+    Format attendu : YYYYMMDDHHMMSS -> retourne un objet datetime.
+    Exemple de ligne SPM :
+    SPM|1|...|20241231235800|20250101000318||Y...
+    On prend le champ à l'index 17 (le 2ème timestamp, ex: 20250101000318).
+    """
+    try:
+        last_spm_date = None
+        with open(file_path, 'r', encoding='utf-8') as f:
+            for line in f:
+                if line.startswith("SPM"):
+                    parts = line.split('|')
+                    # Index 18 = 19ème champ (0-based)
+                    if len(parts) > 18:
+                        date_str = parts[18].strip()
+                        if len(date_str) >= 14:
+                            try:
+                                last_spm_date = datetime.strptime(date_str[:14], "%Y%m%d%H%M%S")
+                            except ValueError:
+                                pass
+        return last_spm_date
+    except Exception as e:
+        print(f"Erreur lors de la lecture de la date dans {file_path}: {e}")
         return None
