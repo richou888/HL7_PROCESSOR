@@ -37,28 +37,32 @@ def extract_hl7_id(file_path):
 
 def extract_hl7_date(file_path):
     """
-    Extrait la date depuis le DERNIER segment SPM d'un fichier HL7.
-    Le champ ciblé est le 17ème champ (index 17 après split '|').
+    Extrait les dates depuis le DERNIER segment SPM d'un fichier HL7.
+    Les champs ciblés sont le 17ème et 18ème champs (index 17 et 18 après split '|').
+    17 = Date de prélèvement de l'échantillon
+    18 = Date de réception de l'échantillon
     Format attendu : YYYYMMDDHHMMSS -> retourne un objet datetime.
     Exemple de ligne SPM :
     SPM|1|...|20241231235800|20250101000318||Y...
     On prend le champ à l'index 17 (le 2ème timestamp, ex: 20250101000318).
     """
     try:
-        last_spm_date = None
+        last_spm_dates = []
         with open(file_path, 'r', encoding='utf-8') as f:
             for line in f:
                 if line.startswith("SPM"):
                     parts = line.split('|')
                     # Index 17 = 18ème champ (0-based) Date de prélèvement
-                    if len(parts) > 17:
-                        date_str = parts[17].strip()
-                        if len(date_str) >= 14:
+                    # Index 18 = 19ème champ (0-based) Date de reception
+                    if len(parts) > 18:
+                        date_str_prelv = parts[17].strip()
+                        date_str_recep = parts[18].strip()
+                        if len(date_str_prelv) >= 14 and len(date_str_recep) >= 14:
                             try:
-                                last_spm_date = datetime.strptime(date_str[:14], "%Y%m%d%H%M%S")
+                                last_spm_dates = [datetime.strptime(date_str_prelv[:14], "%Y%m%d%H%M%S"),datetime.strptime(date_str_recep[:14], "%Y%m%d%H%M%S")]
                             except ValueError:
                                 pass
-        return last_spm_date
+        return last_spm_dates
     except Exception as e:
         print(f"Erreur lors de la lecture de la date dans {file_path}: {e}")
         return None
