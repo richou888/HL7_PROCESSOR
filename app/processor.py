@@ -72,7 +72,7 @@ class HL7Processor:
                         dest = os.path.join(dir_ipp, file)
                         try:
                             shutil.move(file_path, dest)
-                            self.results.append(dest)
+                            self.results.append(f"Fichier : {file} - IPP Exclu : {file_id}")
                             moved = True
                         except Exception as e:
                             print(f"Erreur déplacement IPP {file_path}: {e}")
@@ -84,8 +84,6 @@ class HL7Processor:
                     if file_date is not None:
                         # Hors plage = avant date_start OU après date_end
                         out_of_range = False
-                        print(f"date_start={date_start}, date_end={date_end}")
-                        print(f"DatePrelv {file_date[0]} - DateRecep {file_date[1]}")
                         if date_start and file_date[0] < date_start and file_date[1] < date_start:
                             out_of_range = True
                         if date_end and file_date[0] > date_end and file_date[1] > date_end:
@@ -94,7 +92,7 @@ class HL7Processor:
                             dest = os.path.join(dir_date, file)
                             try:
                                 shutil.move(file_path, dest)
-                                self.results_date.append(dest)
+                                self.results_date.append(f"Fichier : {file} - [ Dates Prélèvement : {file_date[0]} - Dates Reception : {file_date[1]}")
                             except Exception as e:
                                 print(f"Erreur déplacement date {file_path}: {e}")
 
