@@ -52,8 +52,6 @@ def extract_hl7_date(file_path):
             for line in f:
                 if line.startswith("SPM"):
                     parts = line.split('|')
-                    # Index 17 = 18ème champ (0-based) Date de prélèvement
-                    # Index 18 = 19ème champ (0-based) Date de reception
                     if len(parts) > 18:
                         date_str_prelv = parts[17].strip()
                         date_str_recep = parts[18].strip()
