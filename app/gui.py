@@ -134,7 +134,7 @@ class CalendarPicker(ttk.Frame):
         ttk.Button(nav, text="▶▶", width=3,
                    command=self._next_year).pack(side=tk.RIGHT)
         ttk.Button(nav, text="▶", width=3,
-                   command=self._next_month).pack(side=tk.RIGHT, padx=4)
+                   command=self._next_month).pack(side=tk.RIGHT, padx=2)
 
         # -- Jours de la semaine --
         days_frame = ttk.Frame(outer)
