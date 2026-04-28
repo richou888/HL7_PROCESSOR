@@ -84,9 +84,11 @@ class HL7Processor:
                     if file_date is not None:
                         # Hors plage = avant date_start OU après date_end
                         out_of_range = False
-                        if date_start and file_date < date_start:
+                        print(f"date_start={date_start}, date_end={date_end}")
+                        print(f"DatePrelv {file_date[0]} - DateRecep {file_date[1]}")
+                        if date_start and file_date[0] < date_start and file_date[1] < date_start:
                             out_of_range = True
-                        if date_end and file_date > date_end:
+                        if date_end and file_date[0] > date_end and file_date[1] > date_end:
                             out_of_range = True
                         if out_of_range:
                             dest = os.path.join(dir_date, file)
